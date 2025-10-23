@@ -1,0 +1,24 @@
+﻿@using MasExpenseSystem.Entities
+@model List<Service>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var service in Model)
+        {
+            <tr>
+                <td>@service.Name</td>
+                <td>@service.Type</td>
+                <td>
+
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
