@@ -1,5 +1,6 @@
 using DotNetEnv;
 using MasExpenseSystem.Context;
+using MasExpenseSystem.Managers;
 using Microsoft.EntityFrameworkCore;
 using System;
 
@@ -22,6 +23,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseSqlServer(sqlString);
 });
+
+builder.Services.AddScoped<ServiceManager>();
 
 var app = builder.Build();
 
