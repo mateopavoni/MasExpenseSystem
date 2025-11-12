@@ -19,5 +19,20 @@ namespace MasExpenseSystem.Managers
 
             return list;
         }
+
+        public int New(ServiceVM vm)
+        {
+            var model = new Service
+            {
+                UserId = vm.UserId,
+                Name = vm.Name,
+                Type = vm.Type,
+            };
+
+            _dbContext.Services.Add(model);
+            var rowsAffected = _dbContext.SaveChanges();
+            return rowsAffected;
+
+        }
     }
 }
