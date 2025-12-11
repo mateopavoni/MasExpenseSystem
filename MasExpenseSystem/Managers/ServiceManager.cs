@@ -59,5 +59,13 @@ namespace MasExpenseSystem.Managers
             var affected_rows = _dbContext.SaveChanges();
             return affected_rows;
         }
+
+        public int Delete(int id)
+        {
+            var entity = _dbContext.Services.Find(id);
+            _dbContext.Services.Remove(entity);
+            var affected_rows = _dbContext.SaveChanges();
+            return affected_rows;
+        }
     }
 }

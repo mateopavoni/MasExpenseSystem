@@ -54,5 +54,11 @@ namespace MasExpenseSystem.Controllers
             ViewBag.message = "ERROR: Error al editar el service.";
             return View(model);
         }
+
+        public IActionResult Delete(int id)
+        {
+            var response = _manager.Delete(id);
+            return RedirectToAction("index");
+        }
     }
 }
