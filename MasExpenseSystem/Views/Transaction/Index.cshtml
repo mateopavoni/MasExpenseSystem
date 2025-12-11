@@ -1,0 +1,187 @@
+﻿@model ServiceVM
+
+<div class="row mt-4">
+    <div class="col-sm-6 offset-sm-3">
+        <h2>New Transaction</h2>
+
+        <form asp-controller="Service" asp-action="New" method="post">
+
+            <div class="mb-3">  
+                <label class="form-label">Type</label>
+                <select id ="cboTypeService"class="form-select" onchange="ShowServices()">
+                    <option value="0" disabled selected>-- select --</option>
+                    <option value="Income">Income</option>
+                    <option value="Expense">Expense</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Service</label>
+                <select id="cboService" class="form-select">
+                    <option> </option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Comment</label>
+                <input type="text" class="form-control" id="txtComment" autocomplete="off" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Date</label>
+                <input type="date" class="form-control" id="txtDate" autocomplete="off" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Total</label>
+                <input type="number" class="form-control" id="txtTotalAmount" autocomplete="off" />
+            </div>
+
+            <div class="d-grid gap-2 d-md-block">
+                <button class="btn btn-success" type="button" onclick="Save()">Save transaction</button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('#cboService').select2({
+                placeholder: "-- Select a service ---",
+                width: '100%'
+            });
+
+            $('#cboTypeService').on("change", ShowServices);
+
+            const today = new Date().toISOString().split("T")[0];
+            $("#txtDate").val(today);
+        });
+
+        async function ShowServices() {
+            const typeService = $("#cboTypeService").val();
+            console.log("ShowServices -> typeService:", typeService);
+
+            if (!typeService || typeService === "0") {
+                // limpiar select
+                const serviceSelect = $("#cboService");
+                serviceSelect.empty();
+                serviceSelect.append(new Option("-- Select --", ""));
+                serviceSelect.trigger("change");
+                return;
+            }
+
+            try {
+                const response = await fetch(`/Transaction/ServicesByType?typeService=${encodeURIComponent(typeService)}`);
+                console.log("ShowServices -> response.status:", response.status);
+
+                if (!response.ok) {
+                    console.error("Error fetching services:", response.status, response.statusText);
+                    return;
+                }
+
+                const data = await response.json();
+                console.log("ShowServices -> data:", data);
+
+                const serviceSelect = $("#cboService");
+                serviceSelect.empty();
+                serviceSelect.append(new Option("-- Select --", ""));
+
+                data.forEach(item => {
+                    // usa mayúsculas o minúsculas según lo que devuelva el backend
+                    const text = item.name ?? item.Name ?? item.NameService ?? "Unnamed";
+                    const value = item.serviceId ?? item.ServiceId ?? item.Id ?? "";
+                    serviceSelect.append(new Option(text, value));
+                });
+
+                serviceSelect.trigger("change");
+            } catch (err) {
+                console.error("ShowServices - exception:", err);
+            }
+        }
+
+        async function Save(){
+            // validaciones simples
+            const serviceId = $("#cboService").val();
+            const comment = $("#txtComment").val().trim();
+            const date = $("#txtDate").val();
+            const total = $("#txtTotalAmount").val();
+
+            if (!serviceId) {
+                Swal.fire({ title: "Select a service", icon: "warning" });
+                return;
+            }
+            if (!date) {
+                Swal.fire({ title: "Select a date", icon: "warning" });
+                return;
+            }
+            if (!total || Number(total) <= 0) {
+                Swal.fire({ title: "Enter a valid total", icon: "warning" });
+                return;
+            }
+
+            const modelDto = {
+                serviceId: Number(serviceId),
+                comment: comment,
+                date: date,
+                total: Number(total)
+            };
+
+            console.log("Save -> sending payload:", modelDto);
+
+            try {
+                const response = await fetch('/Transaction/New', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(modelDto)
+                });
+
+                console.log("Save -> response.status:", response.status);
+
+                if (!response.ok) {
+                    // intentar leer texto/JSON para más detalle
+                    const txt = await response.text();
+                    console.error("Save -> server returned error:", response.status, txt);
+                    Swal.fire({ title: "Server error", text: txt || "Check console", icon: "error" });
+                    return;
+                }
+
+                // si tu endpoint devuelve JSON con un número/id
+                const data = await response.json();
+                console.log("Save -> response.json:", data);
+
+                if (data && data != 0) {
+                    Swal.fire({ title: "Transaction saved", icon: "success" }).then(() => {
+                        // opcional: redirigir o limpiar form
+                        window.location.reload();
+                    });
+                } else {
+                    Swal.fire({ title: "Could not register!", icon: "error" });
+                }
+
+            } catch (err) {
+                console.error("Save -> exception:", err);
+                Swal.fire({ title: "Network error", text: err.message, icon: "error" });
+            }
+        }
+    </script>
+}
+
+
+
+
+@section Styles{
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <style>
+        .select2-container .select2-selection-single{
+            height: 38px;
+            padding-top: 4px;
+        }
+    </style>
+} 
