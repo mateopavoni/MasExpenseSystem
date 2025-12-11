@@ -17,7 +17,7 @@
                 <tr>
                     <th>Name</th>
                     <th>Type</th>
-                    <th>Actions</th>
+                    <th style="width:100px">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -26,9 +26,9 @@
                     <tr>
                         <td>@service.Name</td>
                         <td>@service.Type</td>
-                        <td>
-                            <a href="/Service/Edit/@service.ServiceId" class="btn btn-warning btn-sm">Edit</a>
-                            <button class="btn btn-danger btn-sm" onclick="deleteItem(@service.ServiceId)">Delete</button>
+                        <td style ="width:100px">
+                            <a href="/Service/Edit/@service.ServiceId" class="btn btn-warning btn-sm"><i class="bi bi-pencil"></i></a>
+                            <button class="btn btn-danger btn-sm" onclick="deleteItem(@service.ServiceId)"><i class="bi bi-trash"></i></button>
                         </td>
                     </tr>
                 }
@@ -38,11 +38,34 @@
 </div>
 
 @section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <script>
         function deleteItem(serviceId) {
-            if (confirm("Are you sure to delete this service?")) {
-                window.location.href = '@Url.Action("Delete", "Service")' + '?id=' + serviceId;
-            }
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You won't be able to revert this!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, delete it!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+
+                    Swal.fire({
+                        title: "Deleted!",
+                        text: "Your service has been deleted.",
+                        icon: "success",
+                        timer: 1200,
+                        showConfirmButton: false
+                    });
+                    setTimeout(() => {
+                        window.location.href = '/Service/Delete?id=' + serviceId;
+                    }, 1200);
+
+                }
+            });
         }
     </script>
 }

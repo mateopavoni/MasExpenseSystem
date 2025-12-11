@@ -67,5 +67,18 @@ namespace MasExpenseSystem.Managers
             var affected_rows = _dbContext.SaveChanges();
             return affected_rows;
         }
+
+        public List<ServiceVM> GetByType(int userId, string type)
+        {
+            var list = _dbContext.Services
+                .Where(item => item.Type == type && item.UserId == userId)
+                .Select(item => new ServiceVM
+                {
+                    ServiceId = item.ServiceId,
+                    Name = item.Name,
+                }).ToList();
+
+            return list;
+        }
     }
 }
