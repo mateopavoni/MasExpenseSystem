@@ -2,20 +2,21 @@
 
 <div class="row mt-4">
     <div class="col-sm-6 offset-sm-3">
-        <h2>New Service</h2>
+        <h2>Edit Service</h2>
 
-        <form asp-controller="Service" asp-action="New" method="post">
+        <form asp-controller="Service" asp-action="Edit" method="post">
+            <input type="hidden" asp-for="ServiceId" />
 
             <div class="mb-3">
                 <label asp-for="Name" class="form-label"></label>
-                <input asp-for="Name" class="form-control" placeholder="Your service name" />
+                <input asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
 
             <div class="mb-3">
                 <label asp-for="Type" class="form-label"></label>
                 <select asp-for="Type" class="form-select">
-                    <option value="" disabled selected>-- select --</option>
+                    <option value="" disabled>-- select --</option>
                     <option value="income">income</option>
                     <option value="expense">expense</option>
                 </select>
@@ -24,13 +25,11 @@
 
             @if (ViewBag.message != null)
             {
-                <div class="alert alert-danger" role="alert">
-                    @ViewBag.message
-                </div>
+                <div class="alert alert-danger">@ViewBag.message</div>
             }
 
             <div class="d-grid gap-2 d-md-block">
-                <button class="btn btn-primary" type="submit">Add New</button>
+                <button class="btn btn-success" type="submit">Save service</button>
                 <a class="btn btn-warning" asp-controller="Service" asp-action="Index">Back</a>
             </div>
 

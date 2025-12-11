@@ -24,12 +24,35 @@ namespace MasExpenseSystem.Controllers
         [HttpPost]
         public IActionResult New(ServiceVM vm)
         {
+
+            if (!ModelState.IsValid) return View(vm);
+
             vm.UserId = 1;
             var response = _manager.New(vm);
             if (response == 1) return RedirectToAction("index");
 
-            ViewBag.message = "Error";
+            ViewBag.message = "ERROR: Error en registrar el service.";
             return View();
+        }
+
+        [HttpGet]
+
+        public IActionResult Edit(int id)
+        {
+            var model = _manager.GetById(id);
+            return View(model);
+        }
+
+        [HttpPost]
+
+        public IActionResult Edit(ServiceVM model)
+        {
+            if(!ModelState.IsValid) return View(model);
+            var response = _manager.Edit(model);
+            if(response == 1) return RedirectToAction("index");
+
+            ViewBag.message = "ERROR: Error al editar el service.";
+            return View(model);
         }
     }
 }
