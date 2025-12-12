@@ -11,5 +11,22 @@ namespace MasExpenseSystem.Controllers
             var viewModel = new LoginVM();
             return View();
         }
+
+        [HttpPost]
+        public IActionResult Login(LoginVM vm)
+        {
+            if (!ModelState.IsValid) return View(vm);
+
+            var found = _userManager.Login(vm);
+            if(found.UserId == 0)
+            {
+                ViewBag.Message = "No matching user found";
+                return View();
+            }
+            else
+            {
+                return RedirectToAction("Index", "Home");
+            }
+        }
     }
 }

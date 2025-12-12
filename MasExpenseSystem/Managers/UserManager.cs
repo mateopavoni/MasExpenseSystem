@@ -12,9 +12,9 @@ namespace MasExpenseSystem.Managers
                     item.Password == vm.Password
                 ).FirstOrDefault();
 
-            var user= new UserVM();
+            var user = new UserVM();
 
-            if (user != null)
+            if (found != null)
             {
                 user.UserId = found.UserId;
                 user.FullName = found.FullName;
