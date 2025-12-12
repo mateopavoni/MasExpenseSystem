@@ -28,5 +28,38 @@ namespace MasExpenseSystem.Controllers
                 return RedirectToAction("Index", "Home");
             }
         }
+
+        public IActionResult Register()
+        {
+            var viewModel = new UserVM();
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult Register(UserVM vm)
+        {
+            if (!ModelState.IsValid) return View(vm);
+            try
+            {
+                var response = _userManager.Register(vm);
+                if (response != 0)
+                {
+                    ViewBag.Message = "Your account has been registered, please try loggin in";
+                    ViewBag.Class = "alert-success";
+                }
+                else
+                {
+                    ViewBag.Message = "Registration failed";
+                    ViewBag.Class = "alert-error";
+                }
+            }
+            catch (InvalidOperationException ex)
+            {
+                ViewBag.Message = ex.Message;
+                ViewBag.Class = "alert-error";
+            }
+
+            return View();
+        }
     }
 }

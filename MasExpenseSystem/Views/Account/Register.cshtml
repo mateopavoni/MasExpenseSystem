@@ -1,0 +1,79 @@
+﻿@model UserVM;
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register - MasExpenseSystem</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+</head>
+
+<body class="bg-light">
+
+    <div class="container">
+        <div class="row justify-content-center align-items-center min-vh-100">
+            <div class="col-md-6 col-lg-4">
+
+                <div class="card shadow-sm">
+                    <div class="card-body p-4">
+
+                        <h2 class="text-center mb-4 fw-bold">Register</h2>
+
+                        <form asp-controller="Account" asp-action="Register" method="post">
+
+                            <div class="mb-3">
+                                <label asp-for="FullName" class="form-label">Full Name</label>
+                                <input asp-for="FullName" class="form-control" placeholder="Your full name">
+                                <span asp-validation-for="FullName" class="text-danger small"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Email" class="form-label">Email</label>
+                                <input type="email" asp-for="Email" class="form-control" placeholder="you@example.com">
+                                <span asp-validation-for="Email" class="text-danger small"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Password" class="form-label">Password</label>
+                                <input type="password" asp-for="Password" class="form-control" placeholder="Choose a password">
+                                <span asp-validation-for="Password" class="text-danger small"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="RepeatPassword" class="form-label">Repeat Password</label>
+                                <input type="password" asp-for="RepeatPassword" class="form-control" placeholder="Repeat your password">
+                                <span asp-validation-for="RepeatPassword" class="text-danger small"></span>
+                            </div>
+
+                            @if (ViewBag.message != null)
+                            {
+                                <div class="alert @ViewBag.Class py-2 small" role="alert">
+                                    @ViewBag.message
+                                </div>
+                            }
+
+                            <div class="d-grid mb-3">
+                                <button class="btn btn-primary" type="submit">Register</button>
+                            </div>
+
+                            <div class="d-grid">
+                                <a asp-controller="Account" asp-action="Login" class="btn btn-outline-secondary">
+                                    Already have an account? Log in
+                                </a>
+                            </div>
+
+                        </form>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
