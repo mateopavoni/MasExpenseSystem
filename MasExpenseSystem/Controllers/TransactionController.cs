@@ -1,55 +1,61 @@
 ﻿using MasExpenseSystem.DTOs;
 using MasExpenseSystem.Managers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
-public class TransactionController : Controller
+using System.Security.Claims;
+namespace MasExpenseSystem.Controllers
 {
-    private readonly ServiceManager _serviceManager;
-    private readonly TransactionManager _transactionManager;
-
-    public TransactionController(
-        ServiceManager serviceManager,
-        TransactionManager transactionManager)
+    [Authorize]
+    public class TransactionController : Controller
     {
-        _serviceManager = serviceManager;
-        _transactionManager = transactionManager;
+        private readonly ServiceManager _serviceManager;
+        private readonly TransactionManager _transactionManager;
+
+        public TransactionController(
+            ServiceManager serviceManager,
+            TransactionManager transactionManager)
+        {
+            _serviceManager = serviceManager;
+            _transactionManager = transactionManager;
+        }
+
+        public IActionResult Index()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult ServicesByType(string typeService)
+        {
+            var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+            var services = _serviceManager.GetByType(int.Parse(userId), typeService);
+            return Ok(services);
+        }
+
+        [HttpPost]
+        public IActionResult New([FromBody] TransactionDTO modelDto)
+        {
+            var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+            modelDto.UserId = int.Parse(userId);
+            var result = _transactionManager.New(modelDto);
+            return Ok(result);
+        }
+
+        [HttpGet]
+
+        public IActionResult History()
+        {
+            return View();
+        }
+
+        [HttpGet]
+
+        public IActionResult HistoryTransaction(DateOnly startDate, DateOnly endDate)
+        {
+            var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)!.Value;;
+            var history = _transactionManager.GetHistory(startDate, endDate, int.Parse(userId));
+            return Ok(new { data = history });
+        }
+
     }
-
-    public IActionResult Index()
-    {
-        return View();
-    }
-
-    [HttpGet]
-    public IActionResult ServicesByType(string typeService)
-    {
-        var userId = 1;
-        var services = _serviceManager.GetByType(userId, typeService);
-        return Ok(services);
-    }
-
-    [HttpPost]
-    public IActionResult New([FromBody] TransactionDTO modelDto)
-    {
-        modelDto.UserId = 1; 
-        var result = _transactionManager.New(modelDto);
-        return Ok(result);
-    }
-
-    [HttpGet]
-
-    public IActionResult History()
-    {
-        return View();
-    }
-
-    [HttpGet]
-
-    public IActionResult HistoryTransaction(DateOnly startDate, DateOnly endDate)
-    {
-        var userId = 1;
-        var history = _transactionManager.GetHistory(startDate, endDate, userId);
-        return Ok(new { data = history });
-    }
-
 }

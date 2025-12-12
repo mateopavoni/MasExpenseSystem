@@ -1,6 +1,7 @@
 using DotNetEnv;
 using MasExpenseSystem.Context;
 using MasExpenseSystem.Managers;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using System;
 
@@ -28,6 +29,16 @@ builder.Services.AddScoped<ServiceManager>();
 builder.Services.AddScoped<TransactionManager>();
 builder.Services.AddScoped<UserManager>();
 
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, config =>
+    {
+        config.Cookie.Name = "User.Login.Cookie";
+        config.LoginPath = "/Account/Login";
+        config.ExpireTimeSpan = TimeSpan.FromHours(1);
+    });
+
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -36,6 +47,8 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Home/Error");
 }
 app.UseRouting();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

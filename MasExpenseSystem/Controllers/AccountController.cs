@@ -1,9 +1,14 @@
 ﻿using MasExpenseSystem.Managers;
 using MasExpenseSystem.Models;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace MasExpenseSystem.Controllers
 {
+    [AllowAnonymous]
     public class AccountController(UserManager _userManager) : Controller
     {
         public IActionResult Login()
@@ -13,21 +18,38 @@ namespace MasExpenseSystem.Controllers
         }
 
         [HttpPost]
-        public IActionResult Login(LoginVM vm)
+        public async Task<IActionResult> Login(LoginVM vm)
         {
-            if (!ModelState.IsValid) return View(vm);
+            if (!ModelState.IsValid)
+                return View(vm);
 
             var found = _userManager.Login(vm);
-            if(found.UserId == 0)
+
+            if (found.UserId == 0)
             {
-                ViewBag.Message = "No matching user found";
-                return View();
+                ViewBag.Message = "Invalid email or password.";
+                ViewBag.Class = "alert-danger";
+                return View(vm);
             }
-            else
-            {
-                return RedirectToAction("Index", "Home");
-            }
+
+            // Claims del usuario
+            var claims = new List<Claim>
+    {
+        new Claim(ClaimTypes.NameIdentifier, found.UserId.ToString()),
+        new Claim(ClaimTypes.Name, found.FullName),
+        new Claim(ClaimTypes.Email, found.Email)
+    };
+
+            var claimsIdentity = new ClaimsIdentity(
+                claims,
+                CookieAuthenticationDefaults.AuthenticationScheme
+            );
+
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+
+            return RedirectToAction("Index", "Home");
         }
+
 
         public IActionResult Register()
         {

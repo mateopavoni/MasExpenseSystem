@@ -2,16 +2,21 @@
 using MasExpenseSystem.Entities;
 using MasExpenseSystem.Managers;
 using MasExpenseSystem.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace MasExpenseSystem.Controllers
 {
+    [Authorize]
     public class ServiceController(ServiceManager _manager) : Controller
     { 
         public IActionResult Index()
         {
-            var services = _manager.GetAll(1);
+
+            var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+            var services = _manager.GetAll(int.Parse(userId));
             return View(services);
         }
 
@@ -26,8 +31,9 @@ namespace MasExpenseSystem.Controllers
         {
 
             if (!ModelState.IsValid) return View(vm);
+            var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
 
-            vm.UserId = 1;
+            vm.UserId = int.Parse(userId);    
             var response = _manager.New(vm);
             if (response == 1) return RedirectToAction("index");
 
